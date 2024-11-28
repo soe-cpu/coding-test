@@ -1,25 +1,46 @@
-import { Head } from "@inertiajs/react";
-import React from "react";
+import { Head, Link, router } from "@inertiajs/react";
+import React, { useMemo, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Breadcrumb from "@/Components/Breadcrumb";
+import getPaginationRange from "@/hooks/getPaginationRange";
+
 const UserList = ({ auth, users }) => {
-    console.log(users);
-    const Pagination = ({
-        postsPerPage,
-        totalPosts,
-        setCurrentPage,
-        currentPage,
-      }) => {
-        const pageNumbers = [];
+    console.log(auth);
 
-        for (let i = 1; i <= Math.ceil(totalPosts / postsPerPage); i++) {
-          pageNumbers.push(i);
-        }
+    const pagination = useMemo(() => {
+        return getPaginationRange(users?.current_page, users?.last_page);
+    }, [users?.current_page, users?.last_page]);
 
-        const paginate = (pageNumber, e) => {
-          e.preventDefault();
-          setCurrentPage(pageNumber);
-        };
+    // Filter start //
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get("page");
+    const limit = urlParams.get("limit");
+    const search = urlParams.get("search");
+
+    const [keyword, setKeyword] = useState(search);
+
+    const handleChangeLimit = (e) => {
+        router.get(
+            "/users",
+            { limit: e?.target.value, page: page, search: search },
+            { replace: true }
+        );
+    };
+
+    const handleKeyword = (keyword) => {
+        router.get(
+            "/users",
+            { limit: limit, page: page, search: keyword },
+            { replace: true }
+        );
+    };
+    // Filter end //
+
+    // Delete
+
+    const handleDelete = (id) => {
+        router.delete(`users/delete/${id}`);
+    };
 
     return (
         <AuthenticatedLayout
@@ -34,9 +55,12 @@ const UserList = ({ auth, users }) => {
             <div>
                 <div className="flex justify-between items-center pb-4  ">
                     <Breadcrumb page={"Users"} action={"List"} />
-                    <button className="bg-blue-500 rounded shadow-sm py-2 px-4 text-sm text-white hover:bg-blue-700">
+                    <Link
+                        href={route("users.create")}
+                        className="bg-indigo-500 rounded shadow-sm py-2 px-4 text-sm text-white hover:bg-indigo-700"
+                    >
                         Add User
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl">
@@ -46,6 +70,7 @@ const UserList = ({ auth, users }) => {
                             <select
                                 id="limit"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
+                                onChange={handleChangeLimit}
                             >
                                 <option value="15">15 Rows</option>
                                 <option value="20">20 Rows</option>
@@ -74,9 +99,19 @@ const UserList = ({ auth, users }) => {
                             </div>
                             <input
                                 id="myInput"
+                                value={keyword}
                                 type="text"
                                 className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
                                 placeholder="Search for users"
+                                onChange={(e) => setKeyword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        // Do code here
+                                        e.preventDefault();
+
+                                        handleKeyword(keyword);
+                                    }
+                                }}
                             />
                         </div>
                     </div>
@@ -102,50 +137,79 @@ const UserList = ({ auth, users }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.data.map((user, index) => {
-                                    return (
-                                        <tr
-                                            className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 border-b"
-                                            key={index}
-                                        >
-                                            <td className="p-4">
-                                                <p>{users.from + index}</p>
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                <p>{user.name}</p>
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                <p>{user.email}</p>
-                                            </td>
-                                            <td className="px-6 py-3">
-                                                <p>{user.created_at}</p>
-                                            </td>
-                                            <td>
-                                                <div className="flex space-x-2 items-center">
-                                                    <h1>Edit</h1>
-                                                    <div>|</div>
-                                                    <h1>Delete</h1>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                {users.data.length > 0 ? (
+                                    users.data.map((user, index) => {
+                                        return (
+                                            <tr
+                                                className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 border-b"
+                                                key={index}
+                                            >
+                                                <td className="p-4">
+                                                    <p>{users.from + index}</p>
+                                                </td>
+                                                <td className="px-6 py-3">
+                                                    <p>{user.name}</p>
+                                                </td>
+                                                <td className="px-6 py-3">
+                                                    <p>{user.email}</p>
+                                                </td>
+                                                <td className="px-6 py-3">
+                                                    <p>{user.created_at}</p>
+                                                </td>
+                                                <td>
+                                                    <div className="flex space-x-2 items-center">
+                                                        <Link
+                                                            href={route(
+                                                                "users.edit",
+                                                                user.id
+                                                            )}
+                                                            className="text-green-500 underline"
+                                                        >
+                                                            Edit
+                                                        </Link>
+                                                        <div>|</div>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    user.id
+                                                                )
+                                                            }
+                                                            className="text-red-500 underline"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                ) : (
+                                    <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 border-b">
+                                        <td colSpan={5}>
+                                            <p className="text-center py-20">
+                                                Nothing not found!
+                                            </p>
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
 
                         <nav
                             aria-label="Page navigation example"
-                            className="flex justify-end mt-4"
+                            className="mt-4 flex justify-end"
                         >
-                            <ul class="flex items-center -space-x-px h-8 text-sm">
+                            <ul className="flex items-center -space-x-px h-8 text-sm">
                                 <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                    <Link
+                                        href={users.prev_page_url}
+                                        className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                                     >
-                                        <span class="sr-only">Previous</span>
+                                        <span className="sr-only">
+                                            Previous
+                                        </span>
                                         <svg
-                                            class="w-2.5 h-2.5 rtl:rotate-180"
+                                            className="w-2.5 h-2.5 rtl:rotate-180"
                                             aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
@@ -159,57 +223,39 @@ const UserList = ({ auth, users }) => {
                                                 d="M5 1 1 5l4 4"
                                             />
                                         </svg>
-                                    </a>
+                                    </Link>
                                 </li>
+                                {pagination.map((page, index) => {
+                                    if (page > 0)
+                                        return (
+                                            <li key={index}>
+                                                <Link
+                                                    href={`users?page=${page}`}
+                                                    className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                                >
+                                                    {page}
+                                                </Link>
+                                            </li>
+                                        );
+                                    else
+                                        return (
+                                            <li
+                                                key={index}
+                                                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                            >
+                                                ...
+                                            </li>
+                                        );
+                                })}
+
                                 <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                                    <Link
+                                        href={users.next_page_url}
+                                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                                     >
-                                        1
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        2
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        aria-current="page"
-                                        class="z-10 flex items-center justify-center px-3 h-8 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                                    >
-                                        3
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        4
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        5
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    >
-                                        <span class="sr-only">Next</span>
+                                        <span className="sr-only">Next</span>
                                         <svg
-                                            class="w-2.5 h-2.5 rtl:rotate-180"
+                                            className="w-2.5 h-2.5 rtl:rotate-180"
                                             aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
@@ -223,7 +269,7 @@ const UserList = ({ auth, users }) => {
                                                 d="m1 9 4-4-4-4"
                                             />
                                         </svg>
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </nav>

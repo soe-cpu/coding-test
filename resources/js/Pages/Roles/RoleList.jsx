@@ -2,8 +2,6 @@ import { Head, Link, router } from "@inertiajs/react";
 import React, { useMemo, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Breadcrumb from "@/Components/Breadcrumb";
-import Pagination from "@/Components/Pagination";
-import ReactPaginate from "react-paginate";
 import getPaginationRange from "@/hooks/getPaginationRange";
 
 const RoleList = ({ auth, roles }) => {
@@ -43,6 +41,7 @@ const RoleList = ({ auth, roles }) => {
     const handleDelete = (id) => {
         router.delete(`roles/delete/${id}`);
     };
+    
 
     return (
         <AuthenticatedLayout

@@ -7,11 +7,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:list|create|edit|delete', ['only' => ['index']]);
+         $this->middleware('permission:create', ['only' => ['create','store']]);
+         $this->middleware('permission:edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:delete', ['only' => ['delete']]);
+    }
+
     public function index(Request $request)  {
 
         $roles = Role::query();
@@ -90,5 +99,14 @@ class RoleController extends Controller
 
         return Redirect::to('/roles');
 
+    }
+
+    public function delete($id): RedirectResponse
+    {
+
+
+        $role = Role::find($id)->delete();
+
+        return Redirect::to('/roles');
     }
 }
