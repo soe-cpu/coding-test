@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\UserController;
 
 /*
@@ -37,8 +38,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Role start //
+    Route::get('roles', [RoleController::class, 'index'])->name('roles');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles/save', [RoleController::class, 'save'])->name('roles.save');
+    Route::get('/roles/edit/{id}', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/update/{id}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/delete/{id}', [RoleController::class, 'delete'])->name('roles.delete');
+    // Role end //
+
     // User start //
     Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users/save', [UserController::class, 'save'])->name('users.save');
+    Route::get('/users/edit/{id}', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
     // User end //
 
 });

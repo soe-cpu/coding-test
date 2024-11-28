@@ -51,6 +51,14 @@ class UserSeeder extends Seeder
             'name' => 'User'
         ]);
 
+        for ($i=0; $i < 100; $i++) {
+            User::create([
+                'name' => $i,
+                'email' => 'email@gmail.com' . $i,
+                'password' => bcrypt('password')
+            ]);
+        }
+
         // User Seeder end //
 
     }
