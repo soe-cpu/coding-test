@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\CompanyController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -55,6 +56,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/delete/{id}', [UserController::class, 'delete'])->name('users.delete');
     // User end //
+
+    // Company start //
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies');
+    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+    Route::post('/companies/save', [CompanyController::class, 'save'])->name('companies.save');
+    Route::get('/companies/edit/{id}', [CompanyController::class, 'edit'])->name('companies.edit');
+    Route::put('/companies/update/{id}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/companies/delete/{id}', [CompanyController::class, 'delete'])->name('companies.delete');
+    // Company end //
 
 });
 
