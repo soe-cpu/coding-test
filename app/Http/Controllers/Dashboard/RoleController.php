@@ -82,7 +82,6 @@ class RoleController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-
         $role = Role::find($id);
         $role->name = $request->input('name');
         $role->save();
@@ -103,7 +102,6 @@ class RoleController extends Controller
 
     public function delete($id): RedirectResponse
     {
-
 
         $role = Role::find($id)->delete();
 

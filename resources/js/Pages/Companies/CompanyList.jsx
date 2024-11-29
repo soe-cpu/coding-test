@@ -5,8 +5,6 @@ import Breadcrumb from "@/Components/Breadcrumb";
 import getPaginationRange from "@/hooks/getPaginationRange";
 
 const CompanyList = ({ auth, companies }) => {
-    console.log(auth);
-
     const pagination = useMemo(() => {
         return getPaginationRange(
             companies?.current_page,
@@ -125,6 +123,9 @@ const CompanyList = ({ auth, companies }) => {
                                     <th scope="col" class="p-4">
                                         No
                                     </th>
+                                    <th scope="col" class="p-4">
+                                        Logo
+                                    </th>
                                     <th scope="col" class="px-6 py-3">
                                         Name
                                     </th>
@@ -141,7 +142,7 @@ const CompanyList = ({ auth, companies }) => {
                             </thead>
                             <tbody>
                                 {companies.data.length > 0 ? (
-                                    companies.data.map((user, index) => {
+                                    companies.data.map((company, index) => {
                                         return (
                                             <tr
                                                 className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 border-b"
@@ -152,21 +153,28 @@ const CompanyList = ({ auth, companies }) => {
                                                         {companies.from + index}
                                                     </p>
                                                 </td>
-                                                <td className="px-6 py-3">
-                                                    <p>{user.name}</p>
+                                                <td className="p-4">
+                                                    <img
+                                                        src={company.logo}
+                                                        alt=""
+                                                        className="w-20 h-20"
+                                                    />
                                                 </td>
                                                 <td className="px-6 py-3">
-                                                    <p>{user.email}</p>
+                                                    <p>{company.name}</p>
                                                 </td>
                                                 <td className="px-6 py-3">
-                                                    <p>{user.created_at}</p>
+                                                    <p>{company.email}</p>
+                                                </td>
+                                                <td className="px-6 py-3">
+                                                    <p>{company.created_at}</p>
                                                 </td>
                                                 <td>
                                                     <div className="flex space-x-2 items-center">
                                                         <Link
                                                             href={route(
                                                                 "companies.edit",
-                                                                user.id
+                                                                company.id
                                                             )}
                                                             className="text-green-500 underline"
                                                         >
@@ -176,7 +184,7 @@ const CompanyList = ({ auth, companies }) => {
                                                         <button
                                                             onClick={() =>
                                                                 handleDelete(
-                                                                    user.id
+                                                                    company.id
                                                                 )
                                                             }
                                                             className="text-red-500 underline"

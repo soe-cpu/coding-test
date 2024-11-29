@@ -6,12 +6,12 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function CompanyCreate({ auth }) {
-    const { data, setData, post, progress, errors } = useForm({
-        name: "",
-        email: "",
+export default function CompanyEdit({ auth, company }) {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        name: company.name,
+        email: company.email,
         logo: null,
-        website: "",
+        website: company.website,
     });
 
     const [selectedImage, setSelectedImage] = useState();
@@ -29,7 +29,7 @@ export default function CompanyCreate({ auth }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post("/companies/save");
+        put(`/companies/update/${company.id}`);
     };
 
     return (
@@ -114,21 +114,27 @@ export default function CompanyCreate({ auth }) {
                             className="mt-2"
                         />
 
-                        {selectedImage && (
-                            <div>
-                                <img
-                                    src={URL.createObjectURL(selectedImage)}
-                                    alt="Thumb"
-                                    className="w-60 h-60"
-                                />
-                                <button
-                                    onClick={removeSelectedImage}
-                                    className="underline text-red-500"
-                                >
-                                    Remove This Image
-                                </button>
-                            </div>
-                        )}
+                        <div>
+                            <img
+                                src={
+                                    selectedImage
+                                        ? URL.createObjectURL(selectedImage)
+                                        : company.logo
+                                }
+                                alt="Thumb"
+                                className="w-60 h-60"
+                            />
+                            {selectedImage && (
+                                <div>
+                                    <button
+                                        onClick={removeSelectedImage}
+                                        className="underline text-red-500"
+                                    >
+                                        Remove This Image
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-start mt-4">

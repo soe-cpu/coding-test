@@ -43,7 +43,6 @@ class UserController extends Controller
 
         $roles = Role::all();
 
-
         return Inertia::render('Users/UserCreate', ["roles" => $roles]);
     }
 
@@ -59,8 +58,6 @@ class UserController extends Controller
 
         $input['password'] = Hash::make($input['password']);
 
-
-
         $user = User::create($input);
 
         $rs = [];
@@ -71,9 +68,6 @@ class UserController extends Controller
             }
         }
         $user->assignRole($rs);
-
-
-
 
         return Redirect::to('/users');
     }
@@ -96,8 +90,6 @@ class UserController extends Controller
             'roles' => 'required'
         ]);
 
-
-
         $input = $request->all();
         if(!empty($input['password'])){
             $input['password'] = Hash::make($input['password']);
@@ -105,15 +97,11 @@ class UserController extends Controller
             $input = Arr::except($input,array('password'));
         }
 
-
-
         $user = User::find($id);
 
         $user->update($input);
 
         DB::table('model_has_roles')->where('model_id',$id)->delete();
-
-
 
         $rs = [];
         foreach ($request->roles as $roleId) {
@@ -129,7 +117,6 @@ class UserController extends Controller
 
     public function delete($id): RedirectResponse
     {
-
 
         $user = User::find($id)->delete();
 
