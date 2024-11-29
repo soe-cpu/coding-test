@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\EmployeeController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\UserController;
 
@@ -65,6 +66,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/companies/update/{id}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('/companies/delete/{id}', [CompanyController::class, 'delete'])->name('companies.delete');
     // Company end //
+
+    // Employee start //
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees');
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/employees/save', [EmployeeController::class, 'save'])->name('employees.save');
+    Route::get('/employees/edit/{id}', [EmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/employees/update/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+    Route::delete('/employees/delete/{id}', [EmployeeController::class, 'delete'])->name('employees.delete');
+    // Employee end //
 
 });
 
