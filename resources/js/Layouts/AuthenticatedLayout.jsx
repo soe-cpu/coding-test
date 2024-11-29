@@ -44,6 +44,11 @@ export default function AuthenticatedLayout({ user, header, children }) {
                                 </span>
                             </NavLink>
                         </li>
+                        <li className="py-2">
+                            <p className="text-indigo-500 font-semibold">
+                                Management
+                            </p>
+                        </li>
                         <li>
                             <NavLink
                                 href={route("users")}
